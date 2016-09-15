@@ -43,9 +43,16 @@ namespace CustomerOffersMobileApp.Controllers
         // POST tables/Offer
         public async Task<IHttpActionResult> PostOffer(Offer item)
         {
-            Offer current = await InsertAsync(item);
-            await SendAndroidNotification(item);
-            return CreatedAtRoute("Tables", new { id = current.Id }, current);
+            try
+            {
+                Offer current = await InsertAsync(item);
+                await SendAndroidNotification(item);
+                return CreatedAtRoute("Tables", new { id = current.Id }, current);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         private async Task SendAndroidNotification(Offer item)

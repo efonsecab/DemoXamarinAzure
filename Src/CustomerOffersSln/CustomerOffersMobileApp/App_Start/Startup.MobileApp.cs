@@ -9,6 +9,7 @@ using Microsoft.Azure.Mobile.Server.Config;
 using CustomerOffersMobileApp.DataObjects;
 using CustomerOffersMobileApp.Models;
 using Owin;
+using Microsoft.Azure.Mobile.Server.Tables.Config;
 
 namespace CustomerOffersMobileApp
 {
@@ -18,10 +19,21 @@ namespace CustomerOffersMobileApp
         {
             HttpConfiguration config = new HttpConfiguration();
 
+            //new MobileAppConfiguration()
+            //    .UseDefaultConfiguration()
+            //    .ApplyTo(config);
+
             new MobileAppConfiguration()
-                .UseDefaultConfiguration()
-                .AddPushNotifications()
-                .ApplyTo(config);
+            .AddMobileAppHomeController()             // from the Home package
+            .MapApiControllers()
+            .AddTables(                               // from the Tables package
+                new MobileAppTableConfiguration()
+                    .MapTableControllers()
+                    .AddEntityFramework()             // from the Entity package
+                )
+            .AddPushNotifications()                   // from the Notifications package
+            .MapLegacyCrossDomainController()         // from the CrossDomain package
+            .ApplyTo(config);
 
             // Use Entity Framework Code First to create database tables based on your DbContext
             Database.SetInitializer(new MobileServiceInitializer());
@@ -58,6 +70,16 @@ namespace CustomerOffersMobileApp
             foreach (TodoItem todoItem in todoItems)
             {
                 context.Set<TodoItem>().Add(todoItem);
+            }
+
+            List<Offer> offerItems = new List<Offer>()
+            {
+                new Offer() {Id=Guid.NewGuid().ToString(), OfferText = "First Offer Seed" }
+            };
+
+            foreach (Offer offerItem in offerItems)
+            {
+                context.Set<Offer>().Add(offerItem);
             }
 
             base.Seed(context);
