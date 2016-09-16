@@ -32,7 +32,7 @@ namespace CustomerOffersMobileApp
                     .AddEntityFramework()             // from the Entity package
                 )
             .AddPushNotifications()                   // from the Notifications package
-            .MapLegacyCrossDomainController()         // from the CrossDomain package
+            //.MapLegacyCrossDomainController()         // from the CrossDomain package
             .ApplyTo(config);
 
             // Use Entity Framework Code First to create database tables based on your DbContext

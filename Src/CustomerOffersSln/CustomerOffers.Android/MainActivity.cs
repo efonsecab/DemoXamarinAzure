@@ -25,6 +25,12 @@ namespace CustomerOffers.Android
             Button button = FindViewById<Button>(Resource.Id.MyButton);
 
             button.Click += delegate { button.Text = string.Format("{0} clicks!", count++); };
+
+            Button btnOffers = FindViewById<Button>(Resource.Id.btnOffers);
+            btnOffers.Click += (o, s) =>
+            {
+                StartActivity(typeof(CustomerOffersActivity));
+            };
         }
     }
 }

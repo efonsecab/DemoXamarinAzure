@@ -53,7 +53,6 @@ namespace CustomerOffers.Android
             // Get the MobileServiceClient from the current activity instance.
             MobileServiceClient client = CustomerOffersActivity.CurrentActivity.CurrentClient;
             var push = client.GetPush();
-
             // Define a message body for GCM.
             const string templateBodyGCM = "{\"data\":{\"message\":\"$(messageParam)\"}}";
 
@@ -71,7 +70,17 @@ namespace CustomerOffers.Android
                 CustomerOffersActivity.CurrentActivity.RunOnUiThread(
 
                     // Register the template with Notification Hubs.
-                    async () => await push.RegisterTemplateAsync(registrationId, templates.ToString(), "CustomerOffersNotificationTemplate"));
+                    async () =>
+                    {
+                        try
+                        {
+                            await push.RegisterTemplateAsync(registrationId, templates.ToString(), "CustomerOffersNotificationTemplate");
+                        }
+                        catch (Microsoft.WindowsAzure.MobileServices.MobileServiceInvalidOperationException ex)
+                        {
+                            string exContent = await ex.Response.Content.ReadAsStringAsync();
+                        }
+                    });
 
                 //System.Diagnostics.Debug.WriteLine(
                 //    string.Format("Push Installation Id", push.InstallationId.ToString()));
