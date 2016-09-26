@@ -81,7 +81,13 @@ namespace CustomerOffersMobileApp.Controllers
             try
             {
                 // Send the push notification and log the results.
-                var result = await hub.SendTemplateNotificationAsync(templateParams);
+                //var result = await hub.SendTemplateNotificationAsync(templateParams);
+                var objPayload = new
+                {
+                    message=item.OfferText + " was added"
+                };
+                string jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(objPayload);
+                var result = await hub.SendGcmNativeNotificationAsync(jsonPayload);
 
                 // Write the success result to the logs.
                 config.Services.GetTraceWriter().Info(result.State.ToString());

@@ -12,6 +12,7 @@ using Android.Widget;
 using Gcm.Client;
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json.Linq;
+using WindowsAzure.Messaging;
 
 [assembly: Permission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
@@ -43,13 +44,27 @@ namespace CustomerOffers.Android
     public class PushHandlerService : GcmServiceBase
     {
         public static string RegistrationID { get; private set; }
+        static NotificationHub hub;
+
+        public static void Initialize(Context context)
+        {
+            // Call this from our main activity
+            var cs = ConnectionString.CreateUsingSharedAccessKeyWithListenAccess(
+                new Java.Net.URI("https://customeroffershub2NS.servicebus.windows.net:443/"),
+                "Endpoint=sb://customeroffershub2ns.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=MHGn2zntbKAN4SppIaD2sk3P9UHLm769HyTDVtPer8U=");
+
+            var hubName = "customeroffershub2";
+
+            hub = new NotificationHub(hubName, cs, context);
+        }
 
         public PushHandlerService() : base(CustomerOfferBroadcastReceiver.senderIDs) { }
 
         protected override void OnRegistered(Context context, string registrationId)
         {
             System.Diagnostics.Debug.WriteLine("The device has been registered with GCM.", "Success!");
-
+            if (hub != null)
+                hub.Register(registrationId);
             // Get the MobileServiceClient from the current activity instance.
             MobileServiceClient client = CustomerOffersActivity.CurrentActivity.CurrentClient;
             var push = client.GetPush();
@@ -74,7 +89,7 @@ namespace CustomerOffers.Android
                     {
                         try
                         {
-                            await push.RegisterTemplateAsync(registrationId, templates.ToString(), "CustomerOffersNotificationTemplate");
+                            //await push.RegisterTemplateAsync(registrationId, templates.ToString(), "testtemplate");
                         }
                         catch (Microsoft.WindowsAzure.MobileServices.MobileServiceInvalidOperationException ex)
                         {
@@ -96,6 +111,7 @@ namespace CustomerOffers.Android
         {
             string message = string.Empty;
 
+            var keys = intent.Extras.KeySet();
             // Extract the push notification message from the intent.
             if (intent.Extras.ContainsKey("message"))
             {
@@ -128,7 +144,8 @@ namespace CustomerOffers.Android
 
         protected override void OnUnRegistered(Context context, string registrationId)
         {
-            throw new NotImplementedException();
+            if (hub != null)
+                hub.Unregister();
         }
 
         protected override void OnError(Context context, string errorId)

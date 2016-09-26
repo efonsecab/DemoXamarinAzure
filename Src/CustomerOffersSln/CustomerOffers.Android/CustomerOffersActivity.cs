@@ -52,7 +52,7 @@ namespace CustomerOffers.Android
                 if (client == null)
                 {
                     ZumoVersionHeaderHandler handler = new ZumoVersionHeaderHandler();
-                    client = new MobileServiceClient("http://v2customeroffersmobileapp.azurewebsites.net", string.Empty, handler );
+                    client = new MobileServiceClient("http://v2customeroffersmobileappbiz.azurewebsites.net", string.Empty, handler );
                 }
                 return client;
             }
@@ -84,7 +84,7 @@ namespace CustomerOffers.Android
             // Make sure the GCM client is set up correctly.
             GcmClient.CheckDevice(this);
             GcmClient.CheckManifest(this);
-
+            PushHandlerService.Initialize(this);
             // Register the app for push notifications.
             GcmClient.Register(this, CustomerOfferBroadcastReceiver.senderIDs);
         }
