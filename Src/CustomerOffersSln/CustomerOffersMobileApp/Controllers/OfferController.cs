@@ -45,6 +45,8 @@ namespace CustomerOffersMobileApp.Controllers
         {
             try
             {
+                item.Id = Guid.NewGuid().ToString();
+                item.CreatedAt = DateTimeOffset.UtcNow;
                 Offer current = await InsertAsync(item);
                 await SendAndroidNotification(item);
                 return CreatedAtRoute("Tables", new { id = current.Id }, current);
