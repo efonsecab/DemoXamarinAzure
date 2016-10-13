@@ -25,7 +25,7 @@ namespace CustomerOffersMobileApp.Controllers
         // GET tables/Offer
         public IQueryable<Offer> GetAllOffer()
         {
-            return Query(); 
+            return Query();
         }
 
         // GET tables/Offer/48D68C86-6EA6-4C25-AA33-223FC9A27959
@@ -37,7 +37,7 @@ namespace CustomerOffersMobileApp.Controllers
         // PATCH tables/Offer/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public Task<Offer> PatchOffer(string id, Delta<Offer> patch)
         {
-             return UpdateAsync(id, patch);
+            return UpdateAsync(id, patch);
         }
 
         // POST tables/Offer
@@ -76,7 +76,6 @@ namespace CustomerOffersMobileApp.Controllers
             // Sending the message so that all template registrations that contain "messageParam"
             // will receive the notifications. This includes APNS, GCM, WNS, and MPNS template registrations.
             Dictionary<string, string> templateParams = new Dictionary<string, string>();
-            templateParams["messageParam"] = item.OfferText + " was added to the list.";
 
             try
             {
@@ -84,9 +83,13 @@ namespace CustomerOffersMobileApp.Controllers
                 //var result = await hub.SendTemplateNotificationAsync(templateParams);
                 var objPayload = new
                 {
-                    message=item.OfferText + " was added"
+                    data = new
+                    {
+                        message = item.OfferText + " was added"
+                    }
                 };
                 string jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(objPayload);
+                templateParams["data"] = item.OfferText + " was added to the list.";
                 var result = await hub.SendGcmNativeNotificationAsync(jsonPayload);
 
                 // Write the success result to the logs.
@@ -103,7 +106,7 @@ namespace CustomerOffersMobileApp.Controllers
         // DELETE tables/Offer/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public Task DeleteOffer(string id)
         {
-             return DeleteAsync(id);
+            return DeleteAsync(id);
         }
     }
 }

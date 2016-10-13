@@ -50,10 +50,10 @@ namespace CustomerOffers.Android
         {
             // Call this from our main activity
             var cs = ConnectionString.CreateUsingSharedAccessKeyWithListenAccess(
-                new Java.Net.URI("https://customeroffershub2NS.servicebus.windows.net:443/"),
-                "Endpoint=sb://customeroffershub2ns.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=MHGn2zntbKAN4SppIaD2sk3P9UHLm769HyTDVtPer8U=");
+                new Java.Net.URI("https://CustomerOffersNS.servicebus.windows.net:443/"),
+                "Endpoint=sb://customeroffersns.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=/2qsB2EVJ7b66NNN4LoaL4AWV0MA002JQr0zKxY/kWU=");
 
-            var hubName = "customeroffershub2";
+            var hubName = "customeroffershub";
 
             hub = new NotificationHub(hubName, cs, context);
         }
@@ -112,10 +112,11 @@ namespace CustomerOffers.Android
             string message = string.Empty;
 
             var keys = intent.Extras.KeySet();
+            string notificationParamName = "message";
             // Extract the push notification message from the intent.
-            if (intent.Extras.ContainsKey("message"))
+            if (intent.Extras.ContainsKey(notificationParamName))
             {
-                message = intent.Extras.Get("message").ToString();
+                message = intent.Extras.Get(notificationParamName).ToString();
                 var title = "New item added:";
 
                 // Create a notification manager to send the notification.
