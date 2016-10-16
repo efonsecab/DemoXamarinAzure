@@ -66,11 +66,16 @@ namespace CustomerOffers.Android
 
             // Create your application here
             // Set the current instance of TodoActivity.
+            SetContentView(Android.Resource.Layout.CustomerOffers);
             instance = this;
             try
             {
                 this.OffersTable = CurrentClient.GetTable<Entities.Offer>();
                 var offersList = await this.OffersTable.ToListAsync();
+                ListView lstOffers = FindViewById<ListView>(Android.Resource.Id.lstOffers);
+                CustomerOfferListAdapter adapter = new CustomerOfferListAdapter(this, Android.Resource.Layout.CustomerOfferRow, offersList);
+                lstOffers.Adapter = adapter;
+                //adapter.NotifyDataSetChanged();
             }
             catch (Microsoft.WindowsAzure.MobileServices.MobileServiceInvalidOperationException iEx)
             {
@@ -81,6 +86,11 @@ namespace CustomerOffers.Android
             {
 
             }
+            //ConfigurePushNotifications();
+        }
+
+        private void ConfigurePushNotifications()
+        {
             // Make sure the GCM client is set up correctly.
             GcmClient.CheckDevice(this);
             GcmClient.CheckManifest(this);

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+  <TableRow
+      android:id="@+id/rowOfferId"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/txtOfferId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="[Offer] ID Goes Here" />
+  </TableRow>
+  <TableRow
+      android:id="@+id/rowOfferDetails"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/txtOfferText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[Offer Text Goes Here]" />
+    <TextView
+        android:id="@+id/txtOfferStartDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Offer Start Date Goes Here" />
+  </TableRow>
+</LinearLayout>
