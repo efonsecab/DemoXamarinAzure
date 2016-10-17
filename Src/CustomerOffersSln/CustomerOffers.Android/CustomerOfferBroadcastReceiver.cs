@@ -13,12 +13,16 @@ using Gcm.Client;
 using Microsoft.WindowsAzure.MobileServices;
 using Newtonsoft.Json.Linq;
 using WindowsAzure.Messaging;
+using CustomerOffers.Android.Entities;
 
 [assembly: Permission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "@PACKAGE_NAME@.permission.C2D_MESSAGE")]
 [assembly: UsesPermission(Name = "com.google.android.c2dm.permission.RECEIVE")]
+[assembly: Permission(Name = "@PACKAGE_NAME@.android.permission.WAKE_LOCK")]
+[assembly: UsesPermission(Name = "@PACKAGE_NAME@.android.permission.WAKE_LOCK")]
+[assembly: Permission(Name = "@PACKAGE_NAME@.android.permission.WAKE_LOCK")]
 
-//GET_ACCOUNTS is only needed for android versions 4.0.3 and below
+//GET_ACCOUNTS is needed only for Android versions 4.0.3 and below
 [assembly: UsesPermission(Name = "android.permission.GET_ACCOUNTS")]
 [assembly: UsesPermission(Name = "android.permission.INTERNET")]
 [assembly: UsesPermission(Name = "android.permission.WAKE_LOCK")]
@@ -27,12 +31,20 @@ using WindowsAzure.Messaging;
 namespace CustomerOffers.Android
 {
     [BroadcastReceiver(Permission = Gcm.Client.Constants.PERMISSION_GCM_INTENTS)]
+    [IntentFilter(new string[] { "com.google.android.gcm.intent.RECEIVE" },
+        Categories = new string[] { "@PACKAGE_NAME@" })]
     [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_MESSAGE },
+        Categories = new string[] { "@PACKAGE_NAME@" })]
+    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_TO_GCM_REGISTRATION },
+        Categories = new string[] { "@PACKAGE_NAME@" })]
+    [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_TO_GCM_UNREGISTRATION },
         Categories = new string[] { "@PACKAGE_NAME@" })]
     [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_REGISTRATION_CALLBACK },
         Categories = new string[] { "@PACKAGE_NAME@" })]
     [IntentFilter(new string[] { Gcm.Client.Constants.INTENT_FROM_GCM_LIBRARY_RETRY },
-    Categories = new string[] { "@PACKAGE_NAME@" })]
+        Categories = new string[] { "@PACKAGE_NAME@" })]
+    [IntentFilter(new string[] { "@PACKAGE_NAME@.com.google.firebase.INSTANCE_ID_EVENT" },
+        Categories = new string[] { "@PACKAGE_NAME@" })]
     public class CustomerOfferBroadcastReceiver : GcmBroadcastReceiverBase<PushHandlerService>
     {
         // Set the Google app ID.
@@ -45,6 +57,7 @@ namespace CustomerOffers.Android
     {
         public static string RegistrationID { get; private set; }
         static NotificationHub hub;
+        private static Context _context = null;
 
         public static void Initialize(Context context)
         {
@@ -56,6 +69,7 @@ namespace CustomerOffers.Android
             var hubName = "customeroffershub";
 
             hub = new NotificationHub(hubName, cs, context);
+            _context = context;
         }
 
         public PushHandlerService() : base(CustomerOfferBroadcastReceiver.senderIDs) { }
@@ -118,6 +132,14 @@ namespace CustomerOffers.Android
             {
                 message = intent.Extras.Get(notificationParamName).ToString();
                 var title = "New item added:";
+                string entityDataKEy = "entitydata";
+                if (intent.Extras.ContainsKey(entityDataKEy))
+                {
+                    string entityJson = intent.Extras.Get(entityDataKEy).ToString();
+                    Offer entity = 
+                        Newtonsoft.Json.JsonConvert.DeserializeObject<Offer>(entityJson);
+                    CustomerOfferListAdapter.Items.Add(entity);
+                }
 
                 // Create a notification manager to send the notification.
                 var notificationManager =
@@ -130,11 +152,12 @@ namespace CustomerOffers.Android
 
                 // Create the notification using the builder.
                 var builder = new Notification.Builder(context);
-                builder.SetAutoCancel(true);
+                //builder.SetAutoCancel(true);
                 builder.SetContentTitle(title);
                 builder.SetContentText(message);
                 builder.SetSmallIcon(Resource.Drawable.Icon);
                 builder.SetContentIntent(contentIntent);
+                builder.SetShowWhen(true);
                 var notification = builder.Build();
 
                 // Display the notification in the Notifications Area.

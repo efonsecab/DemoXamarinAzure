@@ -317,6 +317,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Properties\PublishProfiles\CustomerOffers - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\CustomerOffers - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\CustomerOffersV2Biz.pubxml" />
     <None Include="Properties\PublishProfiles\CustomerOfferV2.pubxml" />
@@ -327,6 +328,12 @@
     <EmbeddedResource Include="Migrations\201609261220286_InitialMigration.resx">
       <DependentUpon>201609261220286_InitialMigration.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CustomerOffers.SharedEntities\CustomerOffers.SharedEntities.csproj">
+      <Project>{379aebf4-e786-4e90-97b2-a2d4fd54b8fd}</Project>
+      <Name>CustomerOffers.SharedEntities</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

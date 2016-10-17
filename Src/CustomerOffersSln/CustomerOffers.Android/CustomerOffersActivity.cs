@@ -15,6 +15,7 @@ using Microsoft.WindowsAzure.MobileServices;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace CustomerOffers.Android
 {
@@ -59,9 +60,11 @@ namespace CustomerOffers.Android
         }
 
         public IMobileServiceTable<Offer> OffersTable { get; set; }
-
+        ListView lstOffers = null;
+        CustomerOfferListAdapter adapter = null;
         protected override async void OnCreate(Bundle savedInstanceState)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             base.OnCreate(savedInstanceState);
 
             // Create your application here
@@ -72,10 +75,13 @@ namespace CustomerOffers.Android
             {
                 this.OffersTable = CurrentClient.GetTable<Entities.Offer>();
                 var offersList = await this.OffersTable.ToListAsync();
-                ListView lstOffers = FindViewById<ListView>(Android.Resource.Id.lstOffers);
-                CustomerOfferListAdapter adapter = new CustomerOfferListAdapter(this, Android.Resource.Layout.CustomerOfferRow, offersList);
+                lstOffers = FindViewById<ListView>(Android.Resource.Id.lstOffers);
+                ObservableCollection<Offer> data = new ObservableCollection<Offer>(offersList);
+                data.CollectionChanged += Data_CollectionChanged;
+                adapter = new CustomerOfferListAdapter(this, Android.Resource.Layout.CustomerOfferRow, data);
                 lstOffers.Adapter = adapter;
-                //adapter.NotifyDataSetChanged();
+                adapter.SetNotifyOnChange(true);
+                adapter.NotifyDataSetChanged();
             }
             catch (Microsoft.WindowsAzure.MobileServices.MobileServiceInvalidOperationException iEx)
             {
@@ -86,7 +92,19 @@ namespace CustomerOffers.Android
             {
 
             }
-            //ConfigurePushNotifications();
+            ConfigurePushNotifications();
+        }
+
+        private void Data_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            RunOnUiThread(() => 
+            {
+                adapter.Add(e.NewItems[0] as Offer);
+            });
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
         }
 
         private void ConfigurePushNotifications()
